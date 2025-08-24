@@ -4,42 +4,46 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
+ * @flow strict-local
  * @format
- * @noflow
  */
 
-'use strict';
+/*::
+import type {InputConfigT} from 'metro-config';
+*/
 
-const {getDefaultConfig} = require('@react-native/metro-config');
-const {mergeConfig} = require('metro-config');
+const {getDefaultConfig, mergeConfig} = require('@react-native/metro-config');
 const path = require('path');
 
+function repositoryPath(relativePath /*: string */) {
+  return path.join(__dirname, '..', '..', relativePath);
+}
+
 /**
- * This cli config is needed for development purposes, e.g. for running
- * integration tests during local development or on CI services.
+ * Metro configuration
+ * https://reactnative.dev/docs/metro
  *
  * @type {import('metro-config').MetroConfig}
  */
 const config = {
   // Make Metro able to resolve required external dependencies
   watchFolders: [
-    path.resolve(__dirname, '../../node_modules'),
-    path.resolve(__dirname, '../assets'),
-    path.resolve(__dirname, '../community-cli-plugin'),
-    path.resolve(__dirname, '../dev-middleware'),
-    path.resolve(__dirname, '../new-app-screen'),
-    path.resolve(__dirname, '../normalize-color'),
-    path.resolve(__dirname, '../polyfills'),
-    path.resolve(__dirname, '../react-native'),
-    path.resolve(__dirname, '../virtualized-lists'),
-    path.resolve(__dirname, '../react-native-popup-menu-android'),
+    repositoryPath('node_modules'),
+    repositoryPath('packages/assets'),
+    repositoryPath('packages/normalize-color'),
+    repositoryPath('packages/polyfills'),
+    repositoryPath('packages/react-native'),
+    repositoryPath('packages/virtualized-lists'),
   ],
   resolver: {
-    blockList: [/..\/react-native\/sdks\/hermes/],
+    blockList: [/..\/..\/packages\/react-native\/sdks\/hermes/],
     extraNodeModules: {
-      'react-native': path.resolve(__dirname, '../react-native'),
+      'react-native': repositoryPath('packages/react-native'),
     },
   },
 };
 
-module.exports = mergeConfig(getDefaultConfig(__dirname), config);
+module.exports = mergeConfig(
+  getDefaultConfig(__dirname),
+  config,
+) /*:: as $ReadOnly<InputConfigT> */;
